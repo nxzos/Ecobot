@@ -1,0 +1,53 @@
+import telebot
+
+bot = telebot.TeleBot('TOKEN')
+
+
+
+WASTE_CATEGORIES = {
+    "пластик": "Жёлтый бак",
+    "стекло": "Зелёный бак (по возможности разделяйте по цветам)",
+    "бумага": "Синий бак",
+    "металл": "Красный бак",
+    "органические отходы": "Коричневый бак",
+    "батарейки": "Сдайте в специальные пункты сбора (не выбрасывайте в обычный бак)",
+    "электроника": "Сдайте в пункты утилизации электроники (не выбрасывайте в обычный бак)",
+    
+}
+
+
+@bot.message_handler(func=lambda message: True)
+def waste_handler(message):
+    user_message = message.text.lower().strip()  # Приводим сообщение к нижнему регистру и убираем лишние пробелы
+    
+    response = None  
+    for waste_type, bin_color in WASTE_CATEGORIES.items():
+        if waste_type in user_message:
+            response = bin_color
+            break  
+
+    if response:
+        bot.reply_to(message, f"Выбрасывайте это в: {response}")
+    else:
+        bot.reply_to(message, "Извините, я не знаю, в какой бак выбросить этот тип отходов. Попробуйте другой тип.")
+
+
+
+@bot.message_handler(commands=['start'])
+def start(message):
+    bot.send_message(message.chat.id, 'Привет я ЕкоБот')
+
+
+@bot.message_handler(commands=['info'])
+def info(message):
+    bot.send_message(message.chat.id, 'Info: Это тг-бот который пишет в баки с каким цветом нужно выкидывать мусор ')
+
+
+@bot.message_handler(commands=['help'])
+def help(message):
+    bot.send_message(message.chat.id, 'Help: ...')
+
+
+
+
+bot.polling()
